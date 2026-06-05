@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XAUUSD Analyzer</title>
+<style>
+body{
+font-family:Arial;
+background:#111;
+color:white;
+text-align:center;
+padding:20px;
+}
+.card{
+background:#222;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+}
+.buy{color:lime;}
+.sell{color:red;}
+.wait{color:orange;}
+</style>
+</head>
+<body>
 
+<h1>XAUUSD Analyzer</h1>
+
+<div class="card">
+<h2>Signal</h2>
+<h1 id="signal" class="wait">WAIT</h1>
+<p>Strength: <span id="strength">0</span>%</p>
+</div>
+
+<script>
+const signals=["BUY","SELL","WAIT"];
+
+function updateSignal(){
+let signal=signals[Math.floor(Math.random()*3)];
+let strength=Math.floor(Math.random()*100);
+
+let el=document.getElementById("signal");
+el.innerText=signal;
+el.className=signal.toLowerCase();
+
+document.getElementById("strength").innerText=strength;
+}
+
+updateSignal();
+setInterval(updateSignal,5000);
+</script>
+
+</body>
+</html>
