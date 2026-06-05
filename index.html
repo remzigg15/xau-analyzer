@@ -3,17 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>XAUUSD Analyzer</title>
+<title>XAUUSD AI Analyzer</title>
+
 <style>
 body{
 font-family:Arial;
-background:#111;
+background:#0f0f0f;
 color:white;
 text-align:center;
 padding:20px;
 }
 .card{
-background:#222;
+background:#1c1c1c;
 padding:20px;
 border-radius:15px;
 margin-top:20px;
@@ -23,9 +24,15 @@ margin-top:20px;
 .wait{color:orange;}
 </style>
 </head>
+
 <body>
 
 <h1>XAUUSD Analyzer</h1>
+
+<div class="card">
+<h2>Price</h2>
+<h1 id="price">Loading...</h1>
+</div>
 
 <div class="card">
 <h2>Signal</h2>
@@ -34,21 +41,66 @@ margin-top:20px;
 </div>
 
 <script>
-const signals=["BUY","SELL","WAIT"];
 
-function updateSignal(){
-let signal=signals[Math.floor(Math.random()*3)];
-let strength=Math.floor(Math.random()*100);
+// 🔥 БЕСПЛАТНЫЙ источник цены (может иногда задерживаться)
+const API = "https://query1.finance.yahoo.com/v7/finance/quote?symbols=XAUUSD=X";
 
-let el=document.getElementById("signal");
-el.innerText=signal;
-el.className=signal.toLowerCase();
+let prices = [];
 
-document.getElementById("strength").innerText=strength;
+async function getPrice(){
+try {
+let res = await fetch(API);
+let data = await res.json();
+
+let price = data.quoteResponse.result[0].regularMarketPrice;
+
+document.getElementById("price").innerText = price;
+
+// сохраняем историю
+prices.push(price);
+if(prices.length > 20) prices.shift();
+
+// анализ
+analyze(prices);
+
+} catch(e){
+document.getElementById("price").innerText = "error";
+}
 }
 
-updateSignal();
-setInterval(updateSignal,5000);
+function analyze(p){
+
+if(p.length < 10) return;
+
+let last = p[p.length-1];
+let prev = p[p.length-5];
+
+// простая логика тренда
+let trend = last > prev;
+
+// сила движения
+let strength = Math.abs(last - prev) * 100;
+
+let signal = "WAIT";
+let cls = "wait";
+
+if(trend && strength > 2){
+signal = "BUY";
+cls = "buy";
+}
+else if(!trend && strength > 2){
+signal = "SELL";
+cls = "sell";
+}
+
+document.getElementById("signal").innerText = signal;
+document.getElementById("signal").className = cls;
+document.getElementById("strength").innerText = strength.toFixed(2);
+}
+
+getPrice();
+setInterval(getPrice, 5000);
+
 </script>
 
 </body>
